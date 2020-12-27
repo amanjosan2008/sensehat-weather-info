@@ -1,2 +1,2 @@
 # sensehat-weather-info
-Display Weather information using onboard sensors &amp; External API Calls.
+Display Weather information using Onboard Sensors and External API Call to openweathermap.com
