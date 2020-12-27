@@ -13,7 +13,7 @@ def api_call():
     addr = socket.getaddrinfo('api.openweathermap.org', 80)
 
     s.connect(addr[0][4])
-    s.send(b'GET http://api.openweathermap.org/data/2.5/weather?lat=53.26&lon=-6.21&appid=84d996853535db149bc40acb09a3ef7&units=metric HTTP/1.0\r\n\r\n')
+    s.send(b'GET http://api.openweathermap.org/data/2.5/weather?lat=53.26&lon=-6.21&appid=84d996853fcc4db149bc40acb09a3ef7&units=metric HTTP/1.0\r\n\r\n')
 
     html = s.recv(1000)
     div = html.split(b'\r\n\r\n')[-1]
@@ -25,32 +25,32 @@ def api_call():
     humidity = str(int(data['main']['humidity']))
     feel = str(int(data['main']['feels_like']))
     desc = data['weather'][0]['description']
+    wind = str(int((data['wind']['speed']) * 3.6))
+    pressure = str(int(data['main']['pressure']))
 
-    return temp, humidity, feel, desc
+    return temp, humidity, feel, desc, wind, pressure
 
 
 while True:
-    #hour = int(time.strftime("%H"))
-    #if hour > 7:
+    inside_temp      = str(int(sense.temp))
+    inside_humidity  = str(int(sense.humidity))
+    inside_pressure  = str(int(sense.pressure))
 
-      inside_temp      = str(int(sense.temp))
-      inside_humidity  = str(int(sense.humidity))
-
-      try:
+    try:
         api              = api_call()
         outside_temp     = api[0]
         outside_humidity = api[1]
-        outside_feel     = api[2]
-        outside_desc     = api[3]
+        outside_pressure = api[5]
+        feel             = api[2]
+        desc             = api[3]
+        wind             = api[4]
 
-        for i in range(5):
-            sense.show_message("Out: " + outside_desc + " " + outside_temp + "'C " + "Fl: " + outside_feel + "\'C " + outside_humidity + "%", text_colour = (155,0,0))
-            sense.show_message("In: " + inside_temp  + "'C " + inside_humidity  + "%", text_colour = (0,155,0))
-            time.sleep(1)
-      except Exception as e:
-        print(e)
-        sense.show_message("In: " + inside_temp  + "'C " + inside_humidity  + "%", text_colour = (0,155,0))
-        time.sleep(1)
+        sense.show_message("Inside: "  + inside_temp  + "'C " + inside_humidity  + "% " + inside_pressure, text_colour = (0,155,0), scroll_speed=0.03)
+        sense.show_message("Outside: " + outside_temp + "'C " + outside_humidity + "% " + outside_pressure, text_colour = (155,0,0), scroll_speed=0.03)
+        sense.show_message("Feels Like: " + feel + "'C " + "Wind: " + wind + "km/h " + desc.title(), text_colour = (155,0,155), scroll_speed=0.03)
 
-    #else:
-      #time.sleep(600)
+    except Exception as e:
+        #print(e)
+        sense.show_message("In: " + inside_temp  + "'C " + inside_humidity  + "%", text_colour = (0,155,0), scroll_speed=0.03)
+        
+    time.sleep(1)
